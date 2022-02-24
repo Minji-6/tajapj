@@ -112,9 +112,7 @@ function checkAccuracy() {
       timer = 1;
   }
 
-  if(window.event.isComposing && len==1 && count > 0) {
-    strInput.value= null;
-  } else if(len > 0 && count > 0) {
+  else if(len > 0 && count > 0) {
     for(i=0; i<len; i++) {
       if(strInput.value.substring(i, i+1) == strText[current].substring(i, i+1)) {
         acc++;
