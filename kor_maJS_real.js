@@ -112,7 +112,7 @@ function checkAccuracy() {
       timer = 1;
   }
 
-  else if(len > 0 && count > 0) {
+  if(len > 0 && count > 0) {
     for(i=0; i<len; i++) {
       if(strInput.value.substring(i, i+1) == strText[current].substring(i, i+1)) {
         acc++;
