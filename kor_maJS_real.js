@@ -115,7 +115,6 @@ function checkAccuracy() {
   }
 
   if(window.event.isComposing && len==1 && count > 0) {
-    alert("한/영 키를 바꿔주세요.");
     strInput.value= null;
   } else if(len > 0 && count > 0) {
     for(i=0; i<len; i++) {
