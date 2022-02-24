@@ -1,8 +1,11 @@
 let strW = [
-    '목마른 사람이 우물 판다', '물이 깊어야 고기가 모인다', '개구리 올챙이 적 생각 못 한다',
-    '미운 자식 떡 하나 더 준다', '가랑잎이 솔잎더러 바스락거린다고 한다', '첫술에 배부를까',
-    '소 잃고 외양간 고치기', '가루는 칠수록 고와지고, 말은 할수록 거칠어진다',
-    '세 살 버릇 여든 간다', '우물 안 개구리', '비는 데는 무쇠도 녹는다', '어물전 망신은 꼴뚜기가 시킨다'
+    'Having nothing, nothing can he lose.', 'The best weapon against an enemy is another enemy.',
+    'All you need in this life is ignorance and confidence, and then success is sure.',
+    'Every bullet has its billet.', 'Art raises its head where creeds relax.',
+    'A man loves the meat in his youth that he cannot endure in his age.',
+    'Like father, like son.', 'In praise there is more obtrusiveness than in blame.',
+    'History will be kind to me for I intend to write it.',
+    'I am easily satisfied with the very best.'
 ];
 
 let strWords = [];
@@ -10,6 +13,8 @@ let score = 0;
 let strText = [];
 let strText_Next = [];
 let count = 0;
+let cnt = 0;
+let last = 5;
 
 let start_time; // 입력 시작 시간
 let end_time;  // 입력 끝난 시간
@@ -17,14 +22,12 @@ let elapsedTime;  // 입력 끝난 시간 - 입력 시작 시간, // 딜레이 �
 let taja_count = 0;  // 입력한 타자수를 저장
 
 let len = 0;
-let tasu = 0;
 let acc = 0;
 let spd = 0;
 let current = 0;
 let time = 0;
 let timer = 0;
 let accuracy = 0;
-let backspace = 0;
 
 let spdArr = [];
 let accArr = [];
@@ -48,6 +51,7 @@ function init() {
 }
 
 
+
 /* 문장 불러오기 */
 function getStrWords() {
     for(i=0; i<strW.length; i++)
@@ -60,7 +64,7 @@ function Speed() {
     // 현재속도 (타수-백스페이스 *2) / 경과시간(초) * 60초
     // 한컴타자는 백스페이스 * +3
     time += 0.01;
-    spd = Math.floor(acc*2*60/time);
+    spd = Math.floor(acc*60/time);
     tajaDisplay.innerText = spd;
 }
 
@@ -104,22 +108,25 @@ function checkAccuracy() {
   acc = 0;
   len = strInput.value.length;
   if(!timer) {
-    if(window.event.isComposing) {
+    if(window.event.keyCode >= 65 && window.event.keyCode <= 90) {
       setTimer = setInterval(Speed, 10);
       timer = 1;
     }
   }
 
- if(len > 1 && count > 0) {
+  if(window.event.isComposing && len==1 && count > 0) {
+    alert("한/영 키를 바꿔주세요.");
+    strInput.value= null;
+  } else if(len > 0 && count > 0) {
     for(i=0; i<len; i++) {
-      if(strInput.value.substring(i,i+1) == strText[current].substring(i, i+1)) {
+      if(strInput.value.substring(i, i+1) == strText[current].substring(i, i+1)) {
         acc++;
       }
     }
     for(i=0; i<strText[current].length; i++) {
       if(strInput.value.substring(i, i+1) != strText[current].substring(i, i+1)
-      && i < len-1) {
-        result += "<font color=#c85448>" + strText[current].substring(i,i+1) + "</font>";
+        && i<len) {
+          result += "<font color=#c85448>" + strText[current].substring(i,i+1) + "</font>";
       } else {
         result += strText[current].substring(i, i+1);
       }
@@ -127,15 +134,15 @@ function checkAccuracy() {
     accuracy = Math.floor(acc/len*100);
     accuracyDisplay.innerText = accuracy;
     strDisplay.innerHTML = result;
-    if(Math.floor(acc/len*100 == 100)) {
+    if(Math.floor(acc/len*100) == 100) {
       accuracyDisplay.style.color = 'black';
     } else {
       accuracyDisplay.style.color = '#c85448';
     }
   } else if(len == 0 && count > 0) {
     if(timer) {
-      clearInterval(setTimer);
-      timer = 0;
+        clearInterval(setTimer);
+        timer = 0;
     }
     time = 0;
     tajaDisplay.innerText = 0;
@@ -144,6 +151,26 @@ function checkAccuracy() {
   }
 }
 
+function tag(){
+  let progress = document.querySelector('.progressTag')
+  let interval = 1
+  let updatesPerSecond = 1000 / 60
+  let end = progress.max * (cnt/last)
+  console.log(cnt);
+
+  function animator () {
+    progress.value = progress.value + interval
+    if ( progress.value + interval < end){
+      setTimeout(animator, updatesPerSecond);
+    } else { 
+      progress.value = end
+    }
+  }
+
+  setTimeout(() => {
+    animator()
+  }, updatesPerSecond)
+}
 
 function checkMatch() {
     user = [strW];
@@ -158,6 +185,8 @@ function checkMatch() {
       strNextDisplay.innerText = 'Next 문장:　' +  strText_Next[count];
       count++;
       strInput.readOnly = false;
+
+      // tag()
     } else if(len >= strText[current].length) {
         if(window.event.keyCode == 13) {
           strDisplay.innerText = strText[count];
@@ -198,6 +227,8 @@ function checkMatch() {
           setTimeout(() => strInput.value = "", 20) // strInput.value = ""; // input 창 초기화
           score = score + 1;
           scoreDisplay.innerText = score;
+          cnt++;
+          tag()
 
           if(score === 6) {
               strInput.value = ""
